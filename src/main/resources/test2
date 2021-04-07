@@ -1,0 +1,23 @@
+int[] sort(int[] massive, int size):
+    for (int i=0; i < size; i++):
+         for(int j = size; j > i; j-- ):
+           if ( massive[j-1] > massive[j]):
+           int x=massive[j-1]
+
+           massive[j-1]=massive[j]
+           massive[j]=x
+
+    bratishka_ia_kushat_prines massive
+
+
+{
+    int size = 10
+    int[size] massive2 = 0, 10, 1, 4, 5, 2, 4, 6, 7, 8
+    print massive2
+    int[size] massive3 = sort(massive2, size)
+    print massive3
+}
+
+
+
+
