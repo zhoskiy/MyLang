@@ -1,19 +1,30 @@
+package VisitorAndWalker;
+
 import antlr4.GrammaticaBaseVisitor;
 import antlr4.GrammaticaParser;
-import block.*;
-import expession.*;
+import block.Function;
+import block.FunctionCall;
+import block.FunctionParam;
+import block.MainFunction;
 import expession.Number;
+import expession.*;
 import my.Abstraction;
 import my.Type;
 import statement.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
-    private String programText;
+
+    private static final TreeMap<String, Map<String, String>> varTable = new TreeMap<>();
+    private static final Map<String, String> varsMemory = new HashMap<>();
+    private static final Map<String, List<Abstraction>> functionParamsMemory = new HashMap<>();
+
 
     @Override
     public Abstraction visitDefineVar(GrammaticaParser.DefineVarContext ctx) {
+        checkForLegalVar(ctx.ID(0).getText());
+
         NameAndValue nameAndValue;
         DefineVar defineVar;
         Expression expression;
@@ -21,6 +32,7 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
             nameAndValue = new NameAndValue(ctx.ID(0).getText());
             expression = (Expression) visit(ctx.expr());
             defineVar = new DefineVar(new Type(ctx.TYPE().getText()), nameAndValue, expression);
+            varsMemory.put(nameAndValue.getName(), ctx.TYPE().getText());
         } else {
             if (ctx.ID().size() == 1 && ctx.NUMBER() == null && ctx.FLOAT() == null) {
                 nameAndValue = new NameAndValue(ctx.ID(0).getText());
@@ -37,10 +49,10 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
                 nameAndValue = new NameAndValue(ctx.ID(0).getText(), a);
             }
 
+            varsMemory.put(nameAndValue.getName(), ctx.TYPE().getText());
             defineVar = new DefineVar(new Type(ctx.TYPE().getText()), nameAndValue);
         }
 
-        programText += defineVar;
         return defineVar;
     }
 
@@ -110,11 +122,18 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
 
     @Override
     public Abstraction visitCompareExp(GrammaticaParser.CompareExpContext ctx) {
+//        System.out.println("check compare " + ctx.expr(0).getText() + " " + ctx.expr(1).getText());
+        checkForIllegalVar(ctx.expr(0).getText());
+        if (visit(ctx.expr(1)).getClass() == Id.class)
+            checkForIllegalVar(ctx.expr(1).getText());
+
         return new Compare((Expression) visit(ctx.expr(0)), (Expression) visit(ctx.expr(1)), ctx.COMPARE().getText());
     }
 
     @Override
     public Abstraction visitUnaryOperExp(GrammaticaParser.UnaryOperExpContext ctx) {
+        checkForIllegalVar(ctx.ID().getText());
+
         return new UnaryOperation(new Id(ctx.ID().getText()), ctx.UNAROPERATION().getText());
     }
 
@@ -130,7 +149,6 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
     @Override
     public Abstraction visitExprStatement(GrammaticaParser.ExprStatementContext ctx) {
         boolean newline = true;
-
         return new ExpressionStatement((Expression) visit(ctx.expr()), newline);
     }
 
@@ -141,15 +159,37 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
 
     @Override
     public Abstraction visitForStatement(GrammaticaParser.ForStatementContext ctx) {
+
+        Expression var = (Expression) visit(ctx.expr(0));
+        String nameFun = null;
+        List<Expression> expressions = new ArrayList<>();
+        if (var.getClass() == DefineVar.class) {
+            DefineVar defineVar = (DefineVar) var;
+            varsMemory.put(defineVar.getNameAndValue().getName(), defineVar.getType().toString());
+            nameFun = varTable.lastKey();
+//            System.out.println(nameFun);
+            varTable.get(nameFun).put(defineVar.getNameAndValue().getName(), defineVar.getType().toString());
+            expressions.add(defineVar);
+        } else expressions.add(var);
+
+        for (int i = 1; i < ctx.expr().size(); i++) {
+            expressions.add((Expression) visit(ctx.expr(i)));
+        }
+
         ArrayList<Abstraction> statements = new ArrayList<>();
         for (GrammaticaParser.StatContext statContext : ctx.stat()) {
             statements.add(visit(statContext));
         }
-        ArrayList<Expression> expression = new ArrayList<>();
-        for (GrammaticaParser.ExprContext exprContext : ctx.expr()) {
-            expression.add((Expression) visit(exprContext));
-        }
-        return new ForStatement(expression, statements);
+
+        if (var.getClass() == DefineVar.class)
+            varTable.get(nameFun).remove(((DefineVar) var).getNameAndValue().getName());
+
+        return new ForStatement(expressions, statements);
+    }
+
+    @Override
+    public Abstraction visitPrintStatement(GrammaticaParser.PrintStatementContext ctx) {
+        return new PrintStatement((Expression) visit(ctx.expr()));
     }
 
     @Override
@@ -192,6 +232,23 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
 
     @Override
     public Abstraction visitFunctionCall(GrammaticaParser.FunctionCallContext ctx) {
+        if (!functionParamsMemory.containsKey(ctx.NAMEFUNC().getText())) {
+            try {
+                throw new Exception("Illegal function call");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Walker.setErrors(true);
+            }
+
+        } else if (functionParamsMemory.get(ctx.NAMEFUNC().getText()).size() != ctx.functionalParam().param().size()) {
+            try {
+                throw new Exception("Illegal number of function parameters");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Walker.setErrors(true);
+            }
+        }
+
         if (ctx.functionalParam() != null) {
             return new FunctionCall(ctx.NAMEFUNC().getText(), (FunctionParam) visit(ctx.functionalParam()));
         } else {
@@ -201,10 +258,18 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
 
     @Override
     public Abstraction visitFunctionMain(GrammaticaParser.FunctionMainContext ctx) {
+
+        Map<String, String> funcVars = new HashMap<>();
+        varsMemory.clear();
+        varTable.put("main", funcVars);
+
         ArrayList<Abstraction> blocks = new ArrayList<>();
         for (GrammaticaParser.BlockStatementContext block : ctx.blockStatement()) {
             blocks.add(visit(block));
+            varTable.get("main").putAll(varsMemory);
         }
+
+        varsMemory.clear();
         return new MainFunction(blocks);
     }
 
@@ -220,17 +285,32 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
     @Override
     public Abstraction visitParam(GrammaticaParser.ParamContext ctx) {
         if (ctx.expr() != null) {
+            if (visit(ctx.expr()).getClass() == DefineVar.class) {
+                DefineVar defineVar = (DefineVar) visit(ctx.expr());
+                varsMemory.put(defineVar.getNameAndValue().getName(), defineVar.getType().toString());
+            }
             return visit(ctx.expr());
         } else return visit(ctx.functionCall());
     }
 
     @Override
     public Abstraction visitFunction(GrammaticaParser.FunctionContext ctx) {
+        varsMemory.clear();
+
+        Map<String, String> funcVars = new HashMap<>(varsMemory);
+        varTable.put(ctx.NAMEFUNC().getText(), funcVars);
+
         ArrayList<Abstraction> blocks = new ArrayList<>();
         for (GrammaticaParser.BlockStatementContext block : ctx.blockStatement()) {
+            varTable.get(ctx.NAMEFUNC().getText()).putAll(varsMemory);
             blocks.add(visit(block));
         }
-        if (ctx.functionalParam() != null){
+
+        varTable.get(ctx.NAMEFUNC().getText()).putAll(varsMemory);
+
+        if (ctx.functionalParam() != null) {
+            FunctionParam param = (FunctionParam) visit(ctx.functionalParam());
+            functionParamsMemory.put(ctx.NAMEFUNC().getText(), param.getParameters());
             return new Function(ctx.TYPEFUNC().getText(), ctx.NAMEFUNC().getText(), (FunctionParam) visit(ctx.functionalParam()), blocks);
         }
         return new Function(ctx.TYPEFUNC().getText(), ctx.NAMEFUNC().getText(), blocks);
@@ -238,7 +318,8 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
 
     @Override
     public Abstraction visitProgram(GrammaticaParser.ProgramContext ctx) {
-        if (ctx.function() != null){
+
+        if (ctx.function() != null) {
             ArrayList<Abstraction> functions = new ArrayList<>();
             for (GrammaticaParser.FunctionContext fun : ctx.function()) {
                 functions.add(visit(fun));
@@ -246,5 +327,31 @@ public class Visitor extends GrammaticaBaseVisitor<Abstraction> {
             return new StartProgram(functions, (MainFunction) visit(ctx.functionMain()));
         }
         return new StartProgram((MainFunction) visit(ctx.functionMain()));
+    }
+
+    private void checkForIllegalVar(String var) {
+//        System.out.println("check illegal in " + varTable.lastEntry().getKey() + " at " + var + "\n" + varTable);
+        if (!varTable.lastEntry().getValue().containsKey(var)) {
+            try {
+                throw new Exception("Illegal variable used: " + var);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Walker.setErrors(true);
+            }
+        }
+
+    }
+
+    private void checkForLegalVar(String var) {
+//        System.out.println("check legal in " + varTable.lastEntry().getKey() + " at " + var + "\n" + varTable);
+        if (varTable.lastEntry().getValue().containsKey(var)) {
+            try {
+                throw new Exception("Variable used: " + var);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Walker.setErrors(true);
+            }
+        }
+
     }
 }

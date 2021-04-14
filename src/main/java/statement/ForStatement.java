@@ -3,13 +3,13 @@ package statement;
 import expession.Expression;
 import my.Abstraction;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ForStatement extends Statement {
-    private final ArrayList<Expression> expressions;
-    private final ArrayList<Abstraction> statements;
+    private final List<Expression> expressions;
+    private final List<Abstraction> statements;
 
-    public ForStatement(ArrayList<Expression> expressions, ArrayList<Abstraction> statements) {
+    public ForStatement(List<Expression> expressions, List<Abstraction> statements) {
         this.expressions = expressions;
         this.statements = statements;
     }
@@ -19,9 +19,9 @@ public class ForStatement extends Statement {
 
         StringBuilder str = new StringBuilder("for(");
         for (Expression exp : expressions) {
-            str.append(exp.toString() + ";");
+            str.append(exp.toString() + "; ");
         }
-        str.deleteCharAt(str.length() - 1);
+        str.deleteCharAt(str.length() - 2);
         str.append(") {\n");
 
         for (Abstraction stat : statements) {

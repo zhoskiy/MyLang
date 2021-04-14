@@ -1,18 +1,22 @@
-INT FUNC ():
-int name1 = 2
-int name2 = 10
-bratishka_ia_pokushat_prines name2 - name1
+INT FUNC (int name1, int name2):
+int c = name1
+int d = name2
+
+Pokazhis(c - d)
+bratishka_ia_pokushat_prines c - d
 
 
 {
 int a = 10
 int b
 b = 10^3 + 5
-FUNC()
+FUNC( a,  b)
 if(a > b):
     for(int i = 1; i < a; i++):
         b = b + i
 
 
  a = 5 * (b-3)^2
+ Pokazhis(a)
 }
+

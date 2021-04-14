@@ -1,7 +1,6 @@
 package statement;
 
 import expession.Compare;
-import expession.Expression;
 import my.Abstraction;
 
 import java.util.ArrayList;

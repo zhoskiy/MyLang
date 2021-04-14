@@ -11,10 +11,12 @@ UNAROPERATION : '++'
 
 TYPE: 'int'
     | 'float'
+    | 'double'
     ;
 
 TYPEFUNC : 'VOID'
          | 'INT'
+         | 'DOUBLE'
          | 'FLOAT';
 
 NAMEFUNC : [A-Z]+;
@@ -61,10 +63,10 @@ blockStatement : functionCall #functionCallState
 assigningValue: ID '=' expr
               ;
 
-defineVar : TYPE ID
-          | TYPE ID '=' NUMBER|FLOAT
+defineVar : TYPE ID '=' expr
+          | TYPE ID
+          | TYPE ID '=' (NUMBER|FLOAT)
           | TYPE ID '=' ID
-          | TYPE ID '=' expr
           ;
 
 expr:   '(' expr ')' #bracketsExp
@@ -85,6 +87,7 @@ stat:   expr NEWLINE #exprStatement
     |   'for(' expr ';' expr ';' expr '):' NEWLINE stat+  NEWLINE #forStatement
     |   DO NEWLINE stat+ WHILE '(' expr COMPARE expr ')' NEWLINE #doWhileStatement
     |   RETURN expr #returnStatement
+    |   'Pokazhis(' expr')' #printStatement
     ;
 
 

@@ -18,6 +18,14 @@ public class DefineVar extends Expression {
         this.expression = expression;
     }
 
+    public Type getType() {
+        return type;
+    }
+
+    public NameAndValue getNameAndValue() {
+        return nameAndValue;
+    }
+
     @Override
     public String toString() {
         if (expression == null) {

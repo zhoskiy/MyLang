@@ -11,6 +11,10 @@ public class FunctionParam extends Abstraction {
         this.parameters = parameters;
     }
 
+    public ArrayList<Abstraction> getParameters() {
+        return parameters;
+    }
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();

@@ -104,6 +104,26 @@ public interface GrammaticaListener extends ParseTreeListener {
 	 */
 	void exitStatement(GrammaticaParser.StatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssigningValue(GrammaticaParser.AssigningValueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssigningValue(GrammaticaParser.AssigningValueContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link GrammaticaParser#defineVar}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefineVar(GrammaticaParser.DefineVarContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link GrammaticaParser#defineVar}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefineVar(GrammaticaParser.DefineVarContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code unaryOperExp}
 	 * labeled alternative in {@link GrammaticaParser#expr}.
 	 * @param ctx the parse tree
@@ -296,23 +316,15 @@ public interface GrammaticaListener extends ParseTreeListener {
 	 */
 	void exitReturnStatement(GrammaticaParser.ReturnStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * Enter a parse tree produced by the {@code printStatement}
+	 * labeled alternative in {@link GrammaticaParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void enterAssigningValue(GrammaticaParser.AssigningValueContext ctx);
+	void enterPrintStatement(GrammaticaParser.PrintStatementContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * Exit a parse tree produced by the {@code printStatement}
+	 * labeled alternative in {@link GrammaticaParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitAssigningValue(GrammaticaParser.AssigningValueContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link GrammaticaParser#defineVar}.
-	 * @param ctx the parse tree
-	 */
-	void enterDefineVar(GrammaticaParser.DefineVarContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link GrammaticaParser#defineVar}.
-	 * @param ctx the parse tree
-	 */
-	void exitDefineVar(GrammaticaParser.DefineVarContext ctx);
+	void exitPrintStatement(GrammaticaParser.PrintStatementContext ctx);
 }

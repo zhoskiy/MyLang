@@ -12,6 +12,6 @@ public class PowExp extends Expression {
 
     @Override
     public String toString() {
-        return "Math.pow(" + left + ", " + right + ")";
+        return "(int) Math.pow(" + left + ", " + right + ")";
     }
 }

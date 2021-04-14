@@ -3,7 +3,6 @@ package block;
 import my.Abstraction;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class Function extends Abstraction {
     private final String type;

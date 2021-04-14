@@ -124,6 +124,30 @@ public class GrammaticaBaseListener implements GrammaticaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterAssigningValue(GrammaticaParser.AssigningValueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAssigningValue(GrammaticaParser.AssigningValueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDefineVar(GrammaticaParser.DefineVarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDefineVar(GrammaticaParser.DefineVarContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterUnaryOperExp(GrammaticaParser.UnaryOperExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -316,25 +340,13 @@ public class GrammaticaBaseListener implements GrammaticaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAssigningValue(GrammaticaParser.AssigningValueContext ctx) { }
+	@Override public void enterPrintStatement(GrammaticaParser.PrintStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAssigningValue(GrammaticaParser.AssigningValueContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterDefineVar(GrammaticaParser.DefineVarContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDefineVar(GrammaticaParser.DefineVarContext ctx) { }
+	@Override public void exitPrintStatement(GrammaticaParser.PrintStatementContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

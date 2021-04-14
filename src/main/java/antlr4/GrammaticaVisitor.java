@@ -68,6 +68,18 @@ public interface GrammaticaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(GrammaticaParser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssigningValue(GrammaticaParser.AssigningValueContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link GrammaticaParser#defineVar}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefineVar(GrammaticaParser.DefineVarContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code unaryOperExp}
 	 * labeled alternative in {@link GrammaticaParser#expr}.
 	 * @param ctx the parse tree
@@ -180,15 +192,10 @@ public interface GrammaticaVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturnStatement(GrammaticaParser.ReturnStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link GrammaticaParser#assigningValue}.
+	 * Visit a parse tree produced by the {@code printStatement}
+	 * labeled alternative in {@link GrammaticaParser#stat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAssigningValue(GrammaticaParser.AssigningValueContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link GrammaticaParser#defineVar}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefineVar(GrammaticaParser.DefineVarContext ctx);
+	T visitPrintStatement(GrammaticaParser.PrintStatementContext ctx);
 }
